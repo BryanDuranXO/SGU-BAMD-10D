@@ -5,6 +5,8 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 import './App.css'
 
 function App() {
+  const ENV = import.meta.env;
+  const API_URL = `http://${ENV.VITE_API_HOST}:${ENV.VITE_API_PORT}${ENV.VITE_API_BASE}`;
 
   const [nombre, setNombre] = useState('');
   const [materno, setMaterno] = useState('');
@@ -15,15 +17,10 @@ function App() {
   const [users, setUsers] = useState([]);
   const [editUser, setEditUser] = useState(null);
 
-  const formData = {
-    nombre,
-    paterno,
-    materno,
-    telefono,
-    correo
-  };
+  const formData = { nombre, paterno, materno, telefono, correo };
 
-  const handleChange = (e) => {
+
+  const onFieldChange = (e) => {
     const { name, value } = e.target;
 
     if (name === "nombre") setNombre(value);
@@ -33,9 +30,9 @@ function App() {
     if (name === "correo") setCorreo(value);
   };
 
-  const getAll = async () => {
+  const fetchUsers = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/users/");
+      const response = await axios.get(`${API_URL}/`);
       setUsers(response.data.data);
     } catch (error) {
       console.log(error);
@@ -43,44 +40,42 @@ function App() {
   };
 
   useEffect(() => {
-    getAll();
+    fetchUsers();
   }, []);
 
-  // ✅ CREATE FUNCIONANDO
-  const Create = async (e) => {
-    e.preventDefault(); // evita recargar la página
+  const createUser = async (e) => {
+    e.preventDefault();
 
     try {
-      await axios.post("http://localhost:8080/api/users/save", formData);
+      await axios.post(`${API_URL}/save`, formData, {
+        headers: { "Content-Type": "application/json" }
+      });
 
-      // actualizar lista
-      getAll();
+      fetchUsers();
 
-      // limpiar campos
       setNombre("");
       setPaterno("");
       setMaterno("");
       setTelefono("");
       setCorreo("");
-
     } catch (error) {
       console.log(error);
     }
   };
 
-  const handleUpdate = async () => {
+  const updateUser = async () => {
     try {
-      await axios.put(`http://localhost:8080/api/users/${editUser.id}`, editUser);
-      getAll();
+      await axios.put(`${API_URL}/${editUser.id}`, editUser);
+      fetchUsers();
     } catch (error) {
       console.log(error);
     }
   };
 
-  const handleDelete = async () => {
+  const deleteUser = async () => {
     try {
-      await axios.delete(`http://localhost:8080/api/users/${editUser.id}`);
-      getAll();
+      await axios.delete(`${API_URL}/${editUser.id}`);
+      fetchUsers();
     } catch (error) {
       console.log(error);
     }
@@ -92,31 +87,31 @@ function App() {
       <h1 className="mb-4">Crud de usuarios</h1>
 
       {/* FORMULARIO */}
-      <form className="row g-3" onSubmit={Create}>
+      <form className="row g-3" onSubmit={createUser}>
 
         <div className="col-md-4">
           <input type="text" name="nombre" className="form-control"
-            placeholder="Nombre" value={formData.nombre} onChange={handleChange} required />
+            placeholder="Nombre" value={formData.nombre} onChange={onFieldChange} required />
         </div>
 
         <div className="col-md-4">
           <input type="text" name="paterno" className="form-control"
-            placeholder="Apellido paterno" value={formData.paterno} onChange={handleChange} required />
+            placeholder="Apellido paterno" value={formData.paterno} onChange={onFieldChange} required />
         </div>
 
         <div className="col-md-4">
           <input type="text" name="materno" className="form-control"
-            placeholder="Apellido materno" value={formData.materno} onChange={handleChange} required />
+            placeholder="Apellido materno" value={formData.materno} onChange={onFieldChange} required />
         </div>
 
         <div className="col-md-6">
           <input type="text" name="telefono" className="form-control"
-            placeholder="Teléfono" value={formData.telefono} onChange={handleChange} required />
+            placeholder="Teléfono" value={formData.telefono} onChange={onFieldChange} required />
         </div>
 
         <div className="col-md-6">
           <input type="email" name="correo" className="form-control"
-            placeholder="Correo" value={formData.correo} onChange={handleChange} required />
+            placeholder="Correo" value={formData.correo} onChange={onFieldChange} required />
         </div>
 
         <div className="col-12">
@@ -125,7 +120,7 @@ function App() {
 
       </form>
 
-      {/* LISTA DE USUARIOS */}
+      {/* LISTA */}
       <div className="row mt-5 g-4">
         {users.map((u) => (
           <div key={u.id} className="col-md-4">
@@ -196,7 +191,7 @@ function App() {
 
             <div className="modal-footer">
               <button className="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-              <button className="btn btn-warning" onClick={handleUpdate} data-bs-dismiss="modal">Guardar cambios</button>
+              <button className="btn btn-warning" onClick={updateUser} data-bs-dismiss="modal">Guardar cambios</button>
             </div>
 
           </div>
@@ -219,7 +214,7 @@ function App() {
 
             <div className="modal-footer">
               <button className="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-              <button className="btn btn-danger" onClick={handleDelete} data-bs-dismiss="modal">Eliminar</button>
+              <button className="btn btn-danger" onClick={deleteUser} data-bs-dismiss="modal">Eliminar</button>
             </div>
 
           </div>

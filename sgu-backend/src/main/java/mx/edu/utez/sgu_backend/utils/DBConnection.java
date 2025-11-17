@@ -9,20 +9,21 @@ import javax.sql.DataSource;
 
 @Configuration
 public class DBConnection {
-    @Value("${DB_HOST}")
-    private String host;
+@Value("${db.host}")
+private String host;
 
-    @Value("${DB_PORT}")
-    private String port;
+@Value("${db.port}")
+private String port;
 
-    @Value("${DB_NAME}")
-    private String name;
+@Value("${db.name}")
+private String name;
 
-    @Value("${DB_USER}")
-    private String user;
+@Value("${db.user}")
+private String user;
 
-    @Value("${DB_PASS}")
-    private String pass;
+@Value("${db.pass}")
+private String pass;
+
 
     @Bean
     public DataSource getConnection(){

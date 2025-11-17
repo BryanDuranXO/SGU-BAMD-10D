@@ -16,9 +16,9 @@ services:
     build:
       context: ./sgu-frontend
       args:
-      API_HOST: localhost
-      API_BASE: /api/users
-      API_PORT: 8081
+        API_HOST: localhost
+        API_BASE: /api/users
+        API_PORT: 8081
     container_name: sgu-frontend
     ports:
       - "3000:80"
@@ -41,7 +41,7 @@ services:
     ports:
       - "8081:8080"
     networks:
-      - adj-net
+      - sgu-net
     depends_on:
       - frontend
 volumes:
